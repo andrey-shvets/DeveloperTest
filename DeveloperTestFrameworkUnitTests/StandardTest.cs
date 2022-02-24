@@ -1,7 +1,7 @@
 ﻿#region Copyright statement
 // --------------------------------------------------------------
 // Copyright (C) 1999-2016 Exclaimer Ltd. All Rights Reserved.
-// No part of this source file may be copied and/or distributed 
+// No part of this source file may be copied and/or distributed
 // without the express permission of a director of Exclaimer Ltd
 // ---------------------------------------------------------------
 #endregion
@@ -19,7 +19,9 @@ namespace DeveloperTestFramework
     [TestFixture]
     public sealed class StandardTest : StandardTestBase<IDeveloperTest>
     {
-        [Timeout(1000), Test]
+        [Test]
+        [Timeout(1000)]
+        [Ignore("Not implemented")]
         public void TestQuestionOne()
         {
             var output = new Question1TestOutput();
@@ -30,7 +32,9 @@ namespace DeveloperTestFramework
             }
         }
 
-        [Test, Timeout(120000)]
+        [Test]
+        [Timeout(120000)]
+        [Ignore("Not implemented")]
         public void TestQuestionTwoMultiple()
         {
             var output = new Question2TestOutput();
@@ -43,7 +47,9 @@ namespace DeveloperTestFramework
             }
         }
 
-        [Test, Timeout(120000)]
+        [Test]
+        [Timeout(120000)]
+        [Ignore("Not implemented")]
         public void TestQuestionTwoSingle()
         {
             var output = new Question2TestOutput();

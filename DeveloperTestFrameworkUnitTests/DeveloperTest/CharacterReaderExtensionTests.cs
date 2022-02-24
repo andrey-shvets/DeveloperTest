@@ -1,36 +1,35 @@
-﻿using DeveloperTest.Reader;
+﻿using DeveloperTest.Extensions;
 using DeveloperTestFramework.DeveloperTest.Helpers;
 using NUnit.Framework;
-using System.IO;
 
 namespace DeveloperTestFramework.DeveloperTest
 {
     [TestFixture]
-    public class WordReaderTests
+    public class CharacterReaderExtensionTests
     {
         [TestCase("")]
         [TestCase(" !!@#$%^&*()_+=-{}[]'\"\\|/?.>,<`~--")]
-        public void GetNextWord_ThrowsEndOfStreamException_ForTextWithNoWords(string content)
+        public void GetNextWord_ReturnsNull_ForTextWithNoWords(string content)
         {
-            var characterReader = new TestCharacterReader(content);
-            var reader = new WordReader(characterReader);
+            var reader = new TestCharacterReader(content);
 
-            Assert.Throws<EndOfStreamException>(() => reader.GetNextWord());
+            var word = reader.GetNextWord();
+
+            Assert.That(word, Is.Null);
         }
 
-        [TestCase("Word", "word")]
-        [TestCase("Word ", "word")]
-        [TestCase("  WoRd", "word")]
+        [TestCase("Word", "Word")]
+        [TestCase("Word ", "Word")]
+        [TestCase("  Word", "Word")]
         [TestCase("word 2ndword", "word")]
         [TestCase("ninja-monkey!", "ninja-monkey")]
-        [TestCase("ninja--monkey!", "ninja")]
-        [TestCase(" -Word", "word")]
-        [TestCase("Word'.", "word")]
-        [TestCase("Word-!", "word")]
+        [TestCase(" ninja--monkey!", "ninja")]
+        [TestCase("-Word", "Word")]
+        [TestCase("Word'.", "Word")]
+        [TestCase("Word-!", "Word")]
         public void GetNextWord_ReadsWord_FromReaderWithSingleWord(string content, string expected)
         {
-            var characterReader = new TestCharacterReader(content);
-            var reader = new WordReader(characterReader);
+            var reader = new TestCharacterReader(content);
 
             var word = reader.GetNextWord();
 
@@ -45,8 +44,7 @@ namespace DeveloperTestFramework.DeveloperTest
         [TestCase("first 'second'", "second")]
         public void GetNextWord_ReadsSecondWord_FromTextWithMultipleWords(string content, string expected)
         {
-            var characterReader = new TestCharacterReader(content);
-            var reader = new WordReader(characterReader);
+            var reader = new TestCharacterReader(content);
 
             _ = reader.GetNextWord();
             var word = reader.GetNextWord();
@@ -55,14 +53,15 @@ namespace DeveloperTestFramework.DeveloperTest
         }
 
         [Test]
-        public void GetNextWord_ThrowsEndOfStreamException_AfterLastWordRead()
+        public void GetNextWord_ReturnsNull_AfterLastWordRead()
         {
             var content = "Word !";
-            var characterReader = new TestCharacterReader(content);
-            var reader = new WordReader(characterReader);
+            var reader = new TestCharacterReader(content);
 
             _ = reader.GetNextWord();
-            Assert.Throws<EndOfStreamException>(() => reader.GetNextWord());
+            var word = reader.GetNextWord();
+
+            Assert.That(word, Is.Null);
         }
     }
 }

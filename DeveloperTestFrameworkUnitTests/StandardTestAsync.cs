@@ -1,20 +1,17 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-using DeveloperTest;
-
+﻿using DeveloperTest;
 using DeveloperTestInterfaces;
-
 using DeveloperTestSupport;
-
 using NUnit.Framework;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DeveloperTestFramework
 {
     [TestFixture]
     public sealed class StandardTestAsync : StandardTestBase<IDeveloperTestAsync>
     {
-        [Timeout(1000), Test]
+        [Test]
+        [Timeout(1000)]
         public async Task TestQuestionOneAsync()
         {
             var output = new Question1TestOutput();
@@ -25,7 +22,8 @@ namespace DeveloperTestFramework
             }
         }
 
-        [Test, Timeout(220000)] // Timeout parameter value changed from 120000 to 220000 by Kostas.
+        [Test]
+        [Timeout(220000)] // Timeout parameter value changed from 120000 to 220000 by Kostas.
         public async Task TestQuestionTwoMultipleAsync()
         {
             var output = new Question2TestOutput();
@@ -38,7 +36,8 @@ namespace DeveloperTestFramework
             }
         }
 
-        [Test, Timeout(120000)]
+        [Test]
+        [Timeout(120000)]
         public async Task TestQuestionTwoSingleAsync()
         {
             var output = new Question2TestOutput();

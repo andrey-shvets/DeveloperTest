@@ -6,10 +6,9 @@
 // ---------------------------------------------------------------
 #endregion
 
-using DeveloperTest.Reader;
+using DeveloperTest.Extensions;
 using DeveloperTestInterfaces;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,20 +19,9 @@ namespace DeveloperTest
     {
         public async Task RunQuestionOne(ICharacterReader reader, IOutputResult output, CancellationToken cancellationToken)
         {
-            var wordReader = new WordReader(reader);
             var countedWords = new ConcurrentDictionary<string, int>();
 
-            try
-            {
-                while (true)
-                {
-                    var nextWord = await wordReader.GetNextWordAsync();
-                    countedWords.AddOrUpdate(nextWord, 1, (_, v) => v + 1);
-                }
-            }
-            catch (EndOfStreamException)
-            { }
-
+            await CountWordsFromReader(countedWords, reader, cancellationToken);
             var sortedWords = countedWords.OrderByDescending(w => w.Value).ThenBy(w => w.Key).Select(w => $"{w.Key} - {w.Value}").ToHashSet();
 
             foreach (var word in sortedWords)
@@ -44,26 +32,26 @@ namespace DeveloperTest
         {
             var countedWords = new ConcurrentDictionary<string, int>();
 
-            foreach (var reader in readers)
-            {
-                var wordReader = new WordReader(reader);
-
-                try
-                {
-                    while (true)
-                    {
-                        var nextWord = await wordReader.GetNextWordAsync();
-                        countedWords.AddOrUpdate(nextWord, 1, (_, v) => v + 1);
-                    }
-                }
-                catch (EndOfStreamException)
-                { }
-            }
+            var wordsCountingTasks = readers.Select(r => CountWordsFromReader(countedWords, r, cancellationToken)).ToArray();
+            await Task.WhenAll(wordsCountingTasks);
 
             var sortedWords = countedWords.OrderByDescending(w => w.Value).ThenBy(w => w.Key).Select(w => $"{w.Key} - {w.Value}").ToHashSet();
 
             foreach (var word in sortedWords)
                 output.AddResult(word);
+        }
+
+        private static async Task CountWordsFromReader(ConcurrentDictionary<string, int> countedWords, ICharacterReader reader, CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                var nextWord = await reader.GetNextWordAsync(cancellationToken);
+
+                if (nextWord is null)
+                    break;
+
+                countedWords.AddOrUpdate(nextWord.ToLower(), 1, (_, v) => v + 1);
+            }
         }
     }
 }
